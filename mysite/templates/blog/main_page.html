@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<form action="" method="post">
+  <div class="row">
+    <script type="text/javascript">
+      var image_id_list = new Array();
+    </script>
+
+  <input type="hidden" id="id_list" name="id_list">
+  <input type="hidden" id="label_list" name="label_list">
+
+  {% for data in data_list %}
+    <div class="col-12 col-sm-6 col-md-3">
+      <div class="info-box">
+        <img src="/media/{{folder_name}}/{{data.data_name}}" style="max-width:100%;"/>
+      </div>
+
+      <div class="card" style="padding: 5px;">
+        <p style="overflow: hidden;">{{data.data_name}}</p>
+        <script type="text/javascript">
+          image_id_list.push({{data.pk}});
+        </script>
+        {% for label_name in label_list %}
+
+        {% if data.data_class != "None" and data.data_class == label_name %}
+        <div>
+          <input type="checkbox" name="{{data.pk}}" value="{{label_name}}" checked="True"> {{label_name}} </input>
+        </div>
+        {% else %}
+        <div>
+          <input type="checkbox" name="{{data.pk}}" value="{{label_name}}" > {{label_name}} </input>
+        </div>
+        {% endif %}
+
+        {% endfor %}
+			</div>
+
+    </div>
+  {% endfor %}
+  </div>
+  <input type="submit" id="btn_submit" value="제출 (넘어가기전에 꼭 제출하기!!!)" class="btn btn-danger" style="width:100%"/>
+</form>
+
+  {% if data_list.has_other_pages %}
+  <nav aria-label="Page navigation example">
+  <div class="card-footer clearfix">
+    <ul class="pagination pagination-sm m-0" style="">
+      {% if data_list.has_previous %}
+        <li class="page-item"><a class="page-link" href="?project_id={{project_id}}&page=1">&laquo;</a></li>
+        <li class="page-item"><a class="page-link" href="?project_id={{project_id}}&page={{prev_page}}">#</a></li>
+      {% endif %}
+      {% for i in paginator_range %}
+        {% if data_list.number == i %}
+          <li class="page-item"><a class="page-link" href="?project_id={{project_id}}&page={{i}}" style="color:black;">{{i}}</a></li>
+        {% else %}
+          <li class="page-item"><a class="page-link" href="?project_id={{project_id}}&page={{i}}">{{i}}</a></li>
+        {% endif %}
+      {% endfor %}
+      {% if data_list.has_next %}
+        <li class="page-item"><a class="page-link" href="?project_id={{project_id}}&page={{next_page}}">#</a></li>
+        <li class="page-item"><a class="page-link" href="?project_id={{project_id}}&page={{last_page}}">&raquo;</a></li>
+      {% endif %}
+    </ul>
+  </div>
+  </nav>
+  {% endif %}
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script type="text/javascript">
+  $('#btn_submit').click(function(){
+    var id_list = ""
+    var label_list = ""
+    for(var i=0; i<image_id_list.length; i++) {
+      $("input[name="+image_id_list[i]+"]:checked").each(function(){
+        id_list += "&" + image_id_list[i];
+        label_list += "&"+$(this).val();
+      });
+    }
+    $('#id_list').val(id_list);
+    $('#label_list').val(label_list);
+  });
+  </script>
+{% endblock %}

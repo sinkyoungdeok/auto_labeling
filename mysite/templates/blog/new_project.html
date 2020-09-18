@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="card card-primary">
+  <div class="card-header">
+    <h3 class="card-title">Make New Project</h3>
+  </div>
+  <form action="" method="POST" enctype="multipart/form-data">
+    <div class="card-body">
+      <div class="form-group">
+        <label for="exampleInputEmail1">Project Name</label>
+        <input type="text" class="form-control" id="project_name" name="project_name" placeholder="Enter the name...   ex)dog_cat">
+      </div>
+      <div class="form-group">
+        <label for="exampleForm2">Image Upload (.zip 파일로 압축한 파일을 올려주세요.)</label>
+        <br>
+        {% csrf_token %}
+          {{form.files}}
+      </div>
+      <div class="form-group">
+        <label for="exampleForm2">Class</label>
+        <br>
+        <button type="button" class="btn btn-primary" id="btn_add">Add</button>
+        <button type="button" class="btn btn-primary" id="btn_minus">Delete</button>
+        <div id="class_list">
+        </div>
+      </div>
+    </div>
+    <input type="hidden" id="class_string" name="class_string">
+    <div class="card-footer">
+      <button type="submit" id="btn_make" class="btn btn-primary">Submit</button>
+    </div>
+  </form>
+</div>
+
+
+
+
+<!-- <form action="" method="POST" enctype="multipart/form-data">
+  <label for="exampleForm2">Project Name</label>
+  <input type="text" id="project_name" name="project_name" class="form-control">
+  <br><br>
+  <label for="exampleForm2">Image Upload</label>
+  <br>
+  {% csrf_token %}
+    {{form.files}}
+  <input type="hidden" id="class_string" name="class_string">
+  <br><br><br>
+  <label for="exampleForm2">Class</label>
+  <br>
+  <button type="button" class="btn btn-danger" id="btn_add">Add</button>
+  <button type="button" class="btn btn-primary" id="btn_minus">minus</button>
+  <div id="class_list"></div>
+  <br>
+  <input type="submit"  id="btn_make" class="btn btn-primary" value="Make New Project" />
+</form> -->
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script type="text/javascript">
+cnt = 0
+
+$('#btn_add').click(function(){
+  cnt += 1
+  $('#class_list').append(
+    '<input type="text" id="'+cnt+'" class="form-control" style="margin-top:5px;">'
+  )
+});
+
+$('#btn_minus').click(function(){
+  $('#'+cnt).remove()
+  cnt -= 1
+});
+
+$('#btn_make').click(function(){
+  var string = ""
+  for (var i = 1; i <= cnt; i++) {
+    string += "&" + $('#'+i).val();
+  }
+  $('#class_string').val(string);
+});
+</script>
+{% endblock %}

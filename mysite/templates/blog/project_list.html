@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">Project List</h3>
+  </div>
+  <div class="card-body">
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th style="width: 3%">#</th>
+          <th style="width: 20%">Project Name</th>
+          <!-- <th>Labelling</th> -->
+          <th style="width: 40%">Progress</th>
+          <th style="width: 5%">Label</th>
+          <th style="width: 10%">Create Date</th>
+          <th style="width: 10%">Download</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for project, progress, index in mylist %}
+        <tr>
+          <td>{{index}}.</td>
+          <td><a href="main_page?project_id={{project.pk}}">{{project.project_name}}</a></td>
+          <td>
+            <div class="progress progress-xs">
+              <div class="progress-bar progress-bar-danger" style="width:{{progress}}%"></div>
+            </div>
+          </td>
+          <td><span class="badge bg-primary">{{progress}}%</span></td>
+          <td>{{project.project_create_date}}</td>
+          <td><a href="csv_download?project_id={{project.pk}}">Download</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
