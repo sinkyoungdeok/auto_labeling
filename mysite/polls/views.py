@@ -6,15 +6,17 @@ import csv
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.utils import timezone
-from polls.models import Project, Images
+from polls.models import Project, Images, UserModel
 from django.views.decorators.csrf import csrf_exempt
 from .forms import UploadFileForm
+from .forms import One_UploadFileForm
 from django.core.paginator import Paginator
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 def project_list(request):
+
     project_list = Project.objects.all()
     progress_list, index_list = [], []
 
@@ -69,8 +71,6 @@ def def_project_list(request):
 
 @csrf_exempt
 def main_page(request):
-    temp_list = []
-
     project_id = request.GET["project_id"]
     project_object = Project.objects.get(pk=project_id)
     project_name = project_object.project_name
@@ -78,6 +78,15 @@ def main_page(request):
     label_list = label_list.split("&")
 
     images = Images.objects.filter(project_id=project_id)
+
+    if request.method == 'POST':
+        id_list = request.POST.get('id_list','default')
+        if id_list == 'default':
+            for data in request.POST.keys(): 
+                model_name, data_name = data.split("/")
+            print(model_name + "/" + data_name)
+            # 이제 여기에서 모델불러와서 images처리해주면됨
+
     page = request.GET.get('page', 1)
 
     paginator = Paginator(images, 20)
@@ -114,15 +123,18 @@ def main_page(request):
 
     if request.method == 'POST':
         id_list = request.POST.get('id_list','default')
-        id_list = id_list[1:].split("&")
+        if id_list != 'default':
+            id_list = id_list[1:].split("&")
 
-        temp_label_list = request.POST.get('label_list','default')
-        temp_label_list = temp_label_list[1:].split("&")
+            temp_label_list = request.POST.get('label_list','default')
+            temp_label_list = temp_label_list[1:].split("&")
 
-        for i in range(0, len(id_list)):
-            data = Images.objects.get(pk=int(id_list[i]))
-            data.data_class = temp_label_list[i]
-            data.save()
+            for i in range(0, len(id_list)):
+                data = Images.objects.get(pk=int(id_list[i]))
+                data.data_class = temp_label_list[i]
+                data.save()
+
+    model_list = UserModel.objects.all()
 
     context = {
         'last_page': paginator.num_pages,
@@ -132,10 +144,14 @@ def main_page(request):
         'data_list':image_list,
         "label_list":label_list,
         "folder_name":project_name,
-        'project_id':project_id
+        'project_id':project_id,
+        'model_list': model_list,
     }
 
+    
+
     return render(request, 'blog/main_page.html', context)
+
 
 
 def handle_uploaded_file(f, project_id, project_name):
@@ -151,6 +167,7 @@ def handle_uploaded_file(f, project_id, project_name):
 def new_project(request):
     form = UploadFileForm()
     if request.method == 'POST':
+        # 프로젝트 새로 생성 
         project_name = request.POST.get('project_name','default')
         class_string = request.POST.get('class_string','default')
 
@@ -171,6 +188,51 @@ def new_project(request):
         form = UploadFileForm()
 
     return render(request, 'blog/new_project.html', {'form': form})
+
+def handle_uploaded_model(f, model_name, data_name):
+    with open(os.path.join(os.getcwd(), "models/" + model_name +"/", f.name), 'wb+') as destination:
+        for chunk in f.chunks():
+            destination.write(chunk)
+            if data_name == None:
+                return f.name
+            #model_model = UserModel(model_name=model_name, data_name=f.name)
+            else:
+                model_model = UserModel(model_name=model_name, data_name=data_name, state_dict_file_name = f.name)
+                model_model.save()
+                break
+
+
+@csrf_exempt
+def new_model(request):
+    form = One_UploadFileForm()
+    if request.method == 'POST':
+        
+        model_name = request.POST.get('model_name','default')
+        form = One_UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                os.mkdir('./models/')
+            except:
+                print("이미 폴더가 존재함")
+
+            os.mkdir('./models/'+model_name)
+            for count, x in enumerate(request.FILES.getlist("files")):
+                if count ==0 :
+                    data_name = handle_uploaded_model(x, model_name, None)
+                else :
+                    handle_uploaded_model(x, model_name, data_name)
+                    
+                
+        mylist = def_project_list(request)
+        return render(request, 'blog/project_list.html', {'mylist': mylist})
+    else:
+        form = One_UploadFileForm()
+    
+    return render(request, 'blog/new_model.html', {'form': form})
+                        
+            
+        
+
 
 
 def csv_download(request):

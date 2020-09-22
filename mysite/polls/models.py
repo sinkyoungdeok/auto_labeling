@@ -10,3 +10,9 @@ class Images(models.Model):
     data_name = models.CharField(max_length=200)
     data_class = models.CharField(max_length=200, default="None")
     data_create_date = models.DateTimeField(auto_now_add=True)
+
+class UserModel(models.Model):
+    model_name = models.CharField(max_length=200)
+    data_name = models.CharField(max_length=200)
+    state_dict_file_name = models.CharField(max_length=200)
+    

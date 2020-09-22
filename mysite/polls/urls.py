@@ -7,4 +7,5 @@ urlpatterns = [
     path('main_page', views.main_page),
     path('new_project', views.new_project),
     path('csv_download', views.csv_download),
+    path('new_model', views.new_model),
 ]

@@ -1,7 +1,14 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<form action="./main_page?project_id={{project_id}}&page=1" method="post">
+{%for model in model_list%}
+
+  <input type="submit" name="{{model.model_name}}/{{model.data_name}}/{{model.state_dict_file_name}}" value="{{model.model_name}}" class="btn btn-danger" style="width:10%"/>
+{% endfor %}
+</form>
 <form action="" method="post">
+  </p>
   <div class="row">
     <script type="text/javascript">
       var image_id_list = new Array();
@@ -24,6 +31,9 @@
         {% for label_name in label_list %}
 
         {% if data.data_class != "None" and data.data_class == label_name %}
+        <!--
+          data.data_class가 사용자가 선택한 label인것같으니 이걸 딥러닝에서 처리하면 될듯!
+        -->
         <div>
           <input type="checkbox" name="{{data.pk}}" value="{{label_name}}" checked="True"> {{label_name}} </input>
         </div>
