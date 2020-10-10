@@ -1,4 +1,2 @@
-*.py linguist-detectable=true
-*.cpp linguist-detectable=false
-*.js linguist-detectable=false
+*.py linguist-vendored=false
 
